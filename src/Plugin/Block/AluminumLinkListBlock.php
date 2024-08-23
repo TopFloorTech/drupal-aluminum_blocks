@@ -11,10 +11,11 @@ namespace Drupal\aluminum_blocks\Plugin\Block;
  * )
  */
 class AluminumLinkListBlock extends AluminumBlockBase {
+
   /**
    * {@inheritdoc}
    */
-  public function getOptions() {
+  public function getOptions(): array {
     return [
       'link_list' => [
         '#type' => 'textarea',
@@ -27,14 +28,20 @@ class AluminumLinkListBlock extends AluminumBlockBase {
   /**
    * {@inheritdoc}
    */
-  public function build() {
+  public function build(): array {
     return [
       '#theme' => 'aluminum_link_list',
       '#list' => $this->getList(),
     ];
   }
 
-  protected function getList() {
+  /**
+   * Gets the link list.
+   *
+   * @return array
+   *   A list of links.
+   */
+  protected function getList(): array {
     $list = [];
 
     $links = $this->getOptionValue('link_list');
@@ -56,4 +63,5 @@ class AluminumLinkListBlock extends AluminumBlockBase {
 
     return $list;
   }
+
 }

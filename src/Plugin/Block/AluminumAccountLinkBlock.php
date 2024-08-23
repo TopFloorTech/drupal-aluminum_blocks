@@ -1,10 +1,14 @@
 <?php
 
 namespace Drupal\aluminum_blocks\Plugin\Block;
-use Drupal\Core\Annotation\Translation;
-use Drupal\Core\Block\Annotation\Block;
+
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Routing\RouteMatch;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Url;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides an 'Account link' block
@@ -15,10 +19,67 @@ use Drupal\Core\Url;
  * )
  */
 class AluminumAccountLinkBlock extends AluminumBlockBase {
+
+  /**
+   * AccountProxyInterface definition.
+   *
+   * @var \Drupal\Core\Session\AccountProxyInterface
+   */
+  protected $account;
+
+  /**
+   * RouteMatchInterface definition.
+   *
+   * @var \Drupal\Core\Routing\RouteMatchInterface
+   */
+  protected $routeMatch;
+
+  /**
+   * Constructs a new AluminumBlockBase object.
+   *
+   * @param array $configuration
+   *   The block plugin configuration.
+   * @param string $plugin_id
+   *   The block plugin id.
+   * @param mixed $plugin_definition
+   *   The plugin definition.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The config factory.
+   * @param \Drupal\Core\Session\AccountProxyInterface $account
+   *   The account proxy.
+   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   *    The route match.
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, ConfigFactoryInterface $config_factory, AccountProxyInterface $account, RouteMatchInterface $route_match) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $config_factory);
+    $this->account = $account;
+    $this->routeMatch = $route_match;
+  }
+
   /**
    * {@inheritdoc}
    */
-  public function getOptions() {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    /** @var \Drupal\Core\Config\ConfigFactoryInterface $config_factory */
+    $config_factory = $container->get('config.factory');
+    /** @var \Drupal\Core\Session\AccountProxyInterface $account */
+    $account = $container->get('current_user');
+    /** @var \Drupal\Core\Routing\RouteMatchInterface $route_match */
+    $route_match = $container->get('current_route_match');
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $config_factory,
+      $account,
+      $route_match
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOptions(): array {
     $options = [];
 
     $options['login_text'] = [
@@ -38,33 +99,63 @@ class AluminumAccountLinkBlock extends AluminumBlockBase {
     return $options;
   }
 
-  protected function getLinkTitle() {
+  /**
+   * Get link title.
+   *
+   * @return array|string
+   *   The link title.
+   */
+  protected function getLinkTitle(): array|string {
     return $this->getOptionValue(($this->isLoggedIn() ? 'account_text' : 'login_text'));
   }
 
-  protected function getLinkUrl() {
+  /**
+   * Get link url.
+   *
+   * @return \Drupal\Core\Url
+   *   The url.
+   */
+  protected function getLinkUrl(): Url {
     return Url::fromRoute(($this->isLoggedIn() ? 'user.page' : 'user.login'));
   }
 
-  protected function getLinkClassFragment() {
+  /**
+   * Get link fragment.
+   *
+   * @return string
+   *   Link class fragment.
+   */
+  protected function getLinkClassFragment(): string {
     return $this->isLoggedIn() ? 'account' : 'login';
   }
 
-  protected function isLoggedIn() {
-    return \Drupal::currentUser()->isAuthenticated();
+  /**
+   * Is user logged in.
+   *
+   * @return bool
+   *   Whether the current user is authenticated.
+   */
+  protected function isLoggedIn(): bool {
+    return $this->account->isAuthenticated();
   }
 
-  protected function isActiveTrail() {
-    $currentUrl = Url::fromRouteMatch(\Drupal::routeMatch())->getInternalPath();
+  /**
+   * Is active trail.
+   *
+   * @return bool
+   *   Whether there is an active trail.
+   */
+  protected function isActiveTrail(): bool {
+    $currentUrl = Url::fromRouteMatch($this->routeMatch)->getInternalPath();
     $url = $this->getLinkUrl()->getInternalPath();
 
-    return (strpos($currentUrl, $url) === 0);
+    return (str_starts_with($currentUrl, $url));
   }
 
   /**
    * {@inheritdoc}
    */
-  public function build() {
+  public function build(): array {
     $classes = [
       'aluminum-account-link',
       'aluminum-account-link--' . $this->getLinkClassFragment(),
@@ -82,10 +173,17 @@ class AluminumAccountLinkBlock extends AluminumBlockBase {
     ];
   }
 
-  public function getCacheContexts() {
-    //if you depends on \Drupal::routeMatch()
-    //you must set context of this block with 'route' context tag.
-    //Every new route this block will rebuild
+  /**
+   * Get cache contexts.
+   *
+   * @return array|string[]
+   *   An array of cache contexts.
+   */
+  public function getCacheContexts(): array {
+    // If you depend on \Drupal::routeMatch()
+    // you must set context of this block with 'route' context tag.
+    // Every new route this block will rebuild
     return Cache::mergeContexts(parent::getCacheContexts(), array('route'));
   }
+
 }

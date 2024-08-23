@@ -2,10 +2,13 @@
 
 namespace Drupal\aluminum_blocks\Plugin\Block;
 
-use Drupal\Core\Annotation\Translation;
-use Drupal\Core\Block\Annotation\Block;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\Url;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a 'Content' block
@@ -16,10 +19,67 @@ use Drupal\Core\Url;
  * )
  */
 class AluminumContentBlock extends AluminumBlockBase {
+
+  /**
+   * EntityTypeManagerInterface definition.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * CurrentPathStack definition.
+   *
+   * @var \Drupal\Core\Path\CurrentPathStack
+   */
+  protected $currentPathStack;
+
+  /**
+   * Constructs a new AluminumBlockBase object.
+   *
+   * @param array $configuration
+   *   The block plugin configuration.
+   * @param string $plugin_id
+   *   The block plugin id.
+   * @param mixed $plugin_definition
+   *   The plugin definition.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The config factory.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
+   * @param \Drupal\Core\Path\CurrentPathStack $current_path_stack
+   *   The current path stack.
+   */
+  public function __construct(array $configuration, string $plugin_id, $plugin_definition, ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager, CurrentPathStack $current_path_stack) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $config_factory);
+    $this->entityTypeManager = $entity_type_manager;
+    $this->currentPathStack = $current_path_stack;
+  }
+
   /**
    * {@inheritdoc}
    */
-  public function getOptions() {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    /** @var \Drupal\Core\Config\ConfigFactoryInterface $config_factory */
+    $config_factory = $container->get('config.factory');
+    /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager */
+    $entity_type_manager = $container->get('entity_type.manager');
+    /** @var \Drupal\Core\Path\CurrentPathStack $current_path_stack */
+    $current_path_stack = $container->get('path.current');
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $config_factory,
+      $entity_type_manager,
+      $current_path_stack
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOptions(): array {
     return [
       'entity_type' => [
         '#type' => 'textfield',
@@ -45,7 +105,7 @@ class AluminumContentBlock extends AluminumBlockBase {
   /**
    * {@inheritdoc}
    */
-  public function build() {
+  public function build(): array {
     $build = [
       '#cache' => [
         'max-age' => 0,
@@ -65,8 +125,9 @@ class AluminumContentBlock extends AluminumBlockBase {
    * Build a view using a view builder for the configured entity and view mode
    *
    * @return array
+   *   The entity view.
    */
-  protected function getEntityView() {
+  protected function getEntityView(): array {
     $entity_view = [];
     $entity = $this->loadEntity();
 
@@ -74,7 +135,7 @@ class AluminumContentBlock extends AluminumBlockBase {
       $view_mode = $this->getOptionValue('view_mode') ?: 'full';
 
       if ($this->hasContent($entity, $view_mode)) {
-        $entity_view = \Drupal::entityTypeManager()
+        $entity_view = $this->entityTypeManager
           ->getViewBuilder($entity->getEntityTypeId())
           ->view($entity, $view_mode);
       }
@@ -84,14 +145,20 @@ class AluminumContentBlock extends AluminumBlockBase {
   }
 
   /**
+   * If the entity has content.
+   *
    * Checks of the entity has content in any of the fields displayed on the
    * provided view mode.
    *
    * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
-   * @param $view_mode
+   *   The entity.
+   * @param string $view_mode
+   *   The view mode.
+   *
    * @return bool
+   *   Whether there is content.
    */
-  protected function hasContent(FieldableEntityInterface $entity, $view_mode) {
+  protected function hasContent(FieldableEntityInterface $entity, string $view_mode): bool {
     $has_content = FALSE;
 
     foreach ($this->getDisplayFields($entity, $view_mode) as $field_name => $field_settings) {
@@ -108,14 +175,18 @@ class AluminumContentBlock extends AluminumBlockBase {
    * Gets the fields that are configured on the provided view mode.
    *
    * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
-   * @param $view_mode
+   *   The entity.
+   * @param string $view_mode
+   *   The view mode.
+   *
    * @return array
+   *   An array of fields.
    */
   protected function getDisplayFields(FieldableEntityInterface $entity, $view_mode) {
     $fields = [];
 
     /** @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display */
-    $display = \Drupal::entityTypeManager()
+    $display = $this->entityTypeManager
       ->getStorage('entity_view_display')
       ->load($entity->getEntityTypeId() . '.' . $entity->bundle() . '.' . $view_mode);
 
@@ -136,7 +207,7 @@ class AluminumContentBlock extends AluminumBlockBase {
    * @return \Drupal\Core\Entity\FieldableEntityInterface|null
    *   The loaded entity, or NULL
    */
-  protected function loadEntity() {
+  protected function loadEntity(): EntityInterface|FieldableEntityInterface|null {
     $entity = NULL;
 
     $entityType = $this->getOptionValue('entity_type');
@@ -149,7 +220,7 @@ class AluminumContentBlock extends AluminumBlockBase {
 
       if (!empty($entityId)) {
         /** @var FieldableEntityInterface $entity */
-        $entity = \Drupal::entityTypeManager()->getStorage($entityType)->load($entityId);
+        $entity = $this->entityTypeManager->getStorage($entityType)->load($entityId);
       }
     }
 
@@ -166,7 +237,7 @@ class AluminumContentBlock extends AluminumBlockBase {
    *   The entity object from the current request URI, or NULL
    */
   protected function loadCurrentEntity($entityType = NULL) {
-    $path = \Drupal::service('path.current')->getPath();
+    $path = $this->currentPathStack->getPath();
 
     $url = Url::fromUri('internal:' . $path);
 
@@ -178,18 +249,20 @@ class AluminumContentBlock extends AluminumBlockBase {
       if (empty($entityType)) {
         if (isset($params['entity_type'])) {
           $entityType = $params['entity_type'];
-        } else {
+        }
+        else {
           $entityType = key($params);
         }
 
       }
 
       if (!empty($entityType)) {
-        $param = isset($params['entity']) ? $params['entity'] : $params[$entityType];
-        $entity = \Drupal::entityTypeManager()->getStorage($entityType)->load($param);
+        $param = $params['entity'] ?? $params[$entityType];
+        $entity = $this->entityTypeManager->getStorage($entityType)->load($param);
       }
     }
 
     return $entity;
   }
+
 }

@@ -2,9 +2,6 @@
 
 namespace Drupal\aluminum_blocks\Plugin\Block;
 
-use Drupal\Core\Annotation\Translation;
-use Drupal\Core\Block\Annotation\Block;
-
 /**
  * Provides an 'Iframe' block
  *
@@ -14,10 +11,11 @@ use Drupal\Core\Block\Annotation\Block;
  * )
  */
 class AluminumIframeBlock extends AluminumBlockBase {
+
   /**
    * {@inheritdoc}
    */
-  public function getOptions() {
+  public function getOptions(): array {
     $options = [];
 
     $options['src'] = [
@@ -108,7 +106,13 @@ class AluminumIframeBlock extends AluminumBlockBase {
     return $options;
   }
 
-  protected function buildWrapperCss() {
+  /**
+   * Builds wrapper CSS classes.
+   *
+   * @return string
+   *   Wrapper CSS classes.
+   */
+  protected function buildWrapperCss(): string {
     $center = $this->getOptionValue('center');
 
     $output = '';
@@ -120,12 +124,17 @@ class AluminumIframeBlock extends AluminumBlockBase {
     return $output;
   }
 
-  protected function buildCss() {
+  /**
+   * Build CSS.
+   *
+   * @return string
+   *   A string of CSS.
+   */
+  protected function buildCss(): string {
     $css = [];
 
     $maxWidth = $this->getOptionValue('max_width');
     $maxHeight = $this->getOptionValue('max_height');
-
 
     if ($maxWidth > 0) {
       $css['max-width'] = $maxWidth;
@@ -147,7 +156,7 @@ class AluminumIframeBlock extends AluminumBlockBase {
   /**
    * {@inheritdoc}
    */
-  public function build() {
+  public function build(): array {
     return [
       '#theme' => 'aluminum_iframe',
       '#src' => $this->getOptionValue('src'),
@@ -163,4 +172,5 @@ class AluminumIframeBlock extends AluminumBlockBase {
       '#wrapper_css' => $this->buildWrapperCss(),
     ];
   }
+
 }

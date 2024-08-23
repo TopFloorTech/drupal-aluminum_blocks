@@ -13,10 +13,11 @@ use Drupal\Core\Cache\Cache;
  * )
  */
 class AluminumAddThisBlock extends AluminumBlockBase {
+
   /**
    * {@inheritdoc}
    */
-  public function build() {
+  public function build(): array {
     $build = [
       '#markup' => '<div class="AddThis"><div class="addthis_inline_share_toolbox"></div></div>',
       '#attached' => ['library' => ['aluminum_blocks/aluminum_addthis']],
@@ -27,10 +28,17 @@ class AluminumAddThisBlock extends AluminumBlockBase {
     return $build;
   }
 
-  public function getCacheContexts() {
+  /**
+   * Get cache contexts.
+   *
+   * @return array|string[]
+   *   An array of cache contexts.
+   */
+  public function getCacheContexts(): array {
     //if you depends on \Drupal::routeMatch()
     //you must set context of this block with 'route' context tag.
     //Every new route this block will rebuild
     return Cache::mergeContexts(parent::getCacheContexts(), array('route'));
   }
+
 }

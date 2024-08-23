@@ -14,9 +14,13 @@ function aluminum_blocks_help($route_name, RouteMatchInterface $route_match) {
   switch ($route_name) {
     case 'help.page.aluminum_blocks':
       return check_markup(file_get_contents(dirname(__FILE__) . "/README.txt"));
+      break;
   }
 }
 
+/**
+ * Implements hook_theme().
+ */
 function aluminum_blocks_theme($existing, $type, $theme, $path) {
   return [
     'aluminum_follow_list' => [
@@ -29,28 +33,52 @@ function aluminum_blocks_theme($existing, $type, $theme, $path) {
       'variables' => ['link_list' => NULL, 'button_text' => NULL],
     ],
     'aluminum_phone_number' => [
-      'variables' => ['phone_number' => NULL, 'url' => NULL]
+      'variables' => ['phone_number' => NULL, 'url' => NULL],
     ],
     'aluminum_phone_number_list' => [
       'variables' => ['list' => NULL],
     ],
     'aluminum_content' => [
-      'variables' => ['entity_Type' => NULL, 'entity_id' => NULL, 'view_mode' => NULL]
+      'variables' => [
+        'entity_Type' => NULL,
+        'entity_id' => NULL,
+        'view_mode' => NULL,
+      ],
     ],
     'aluminum_office_info' => [
-      'variables' => ['address' => NULL, 'phone_list' => NULL, 'office_hours' => NULL]
+      'variables' => [
+        'address' => NULL,
+        'phone_list' => NULL,
+        'office_hours' => NULL,
+      ],
     ],
     'aluminum_icon' => [
-      'variables' => ['icon' => NULL, 'output_as_link' => NULL, 'link_url' => NULL]
+      'variables' => [
+        'icon' => NULL,
+        'output_as_link' => NULL,
+        'link_url' => NULL,
+      ],
     ],
     'aluminum_link' => [
-      'variables' => ['title' => NULL, 'url' => NULL, 'classes' => []],
+      'variables' => [
+        'title' => NULL,
+        'url' => NULL,
+        'classes' => [],
+      ],
     ],
     'aluminum_script_tag' => [
-      'variables' => ['wrapper_classes' => '', 'wrapper_id' => '', 'script' => NULL],
+      'variables' => [
+        'wrapper_classes' => '',
+        'wrapper_id' => '',
+        'script' => NULL,
+      ],
     ],
     'aluminum_snippet' => [
-      'variables' => ['wrapper_classes' => '', 'wrapper_id' => '', 'snippet' => ''],
+      'variables' => [
+        'wrapper_classes' => '',
+        'wrapper_id' => '',
+        'snippet' => '',
+      ],
     ],
     'aluminum_iframe' => [
       'variables' => [
@@ -67,11 +95,4 @@ function aluminum_blocks_theme($existing, $type, $theme, $path) {
       ],
     ],
   ];
-}
-
-/**
- * Implements hook_library_info_alter().
- */
-function aluminum_blocks_library_info_alter(&$libraries, $extension) {
-
 }

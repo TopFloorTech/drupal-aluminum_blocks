@@ -2,8 +2,6 @@
 
 namespace Drupal\aluminum_blocks\Plugin\Block;
 
-use Drupal\Core\Annotation\Translation;
-use Drupal\Core\Block\Annotation\Block;
 use Drupal\Core\Render\Markup;
 
 /**
@@ -18,7 +16,7 @@ class AluminumSnippetBlock extends AluminumBlockBase {
   /**
    * {@inheritdoc}
    */
-  public function getOptions() {
+  public function getOptions(): array {
     $options = [];
 
     $options['wrapper_classes'] = [
@@ -48,7 +46,7 @@ class AluminumSnippetBlock extends AluminumBlockBase {
   /**
    * {@inheritdoc}
    */
-  public function build() {
+  public function build(): array {
     $classes = $this->getOptionValue('wrapper_classes');
 
     $classes = trim('AluminumSnippet ' . $classes);

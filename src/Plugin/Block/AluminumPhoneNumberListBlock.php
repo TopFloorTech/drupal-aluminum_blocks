@@ -1,15 +1,8 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: BMcClure
- * Date: 9/9/2016
- * Time: 2:13 PM
- */
 
 namespace Drupal\aluminum_blocks\Plugin\Block;
+
 use Drupal\aluminum_storage\Aluminum\Config\ConfigManager;
-use Drupal\Core\Annotation\Translation;
-use Drupal\Core\Block\Annotation\Block;
 
 /**
  * Provides a 'Phone number list' block
@@ -20,7 +13,14 @@ use Drupal\Core\Block\Annotation\Block;
  * )
  */
 class AluminumPhoneNumberListBlock extends AluminumBlockBase {
-  protected function getPhoneNumberOptions() {
+
+  /**
+   * Gets phone number options.
+   *
+   * @return array
+   *   An array of phone number options.
+   */
+  protected function getPhoneNumberOptions(): array {
     $options = [];
 
     foreach (aluminum_storage_phone_numbers() as $phone_number_type => $info) {
@@ -33,7 +33,7 @@ class AluminumPhoneNumberListBlock extends AluminumBlockBase {
   /**
    * {@inheritdoc}
    */
-  public function getOptions() {
+  public function getOptions(): array {
     $options = [];
 
     $options['enabled_phone_numbers'] = [
@@ -54,7 +54,15 @@ class AluminumPhoneNumberListBlock extends AluminumBlockBase {
     return $options;
   }
 
-  protected function getList() {
+  /**
+   * Get list of phone numbers.
+   *
+   * @return array
+   *   A list.
+   *
+   * @throws \Drupal\aluminum_storage\Aluminum\Exception\ConfigException
+   */
+  protected function getList(): array {
     $enabled = array_keys(array_filter($this->getOptionValue('enabled_phone_numbers')));
     $phone_numbers = aluminum_storage_phone_numbers();
     $display_short_titles = $this->getOptionValue('display_short_titles');
@@ -84,10 +92,11 @@ class AluminumPhoneNumberListBlock extends AluminumBlockBase {
   /**
    * {@inheritdoc}
    */
-  public function build() {
+  public function build(): array {
     return [
       '#theme' => 'aluminum_phone_number_list',
       '#list' => $this->getList(),
     ];
   }
+
 }

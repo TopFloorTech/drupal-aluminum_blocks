@@ -1,9 +1,8 @@
 <?php
 
 namespace Drupal\aluminum_blocks\Plugin\Block;
+
 use Drupal\aluminum_storage\Aluminum\Config\ConfigManager;
-use Drupal\Core\Annotation\Translation;
-use Drupal\Core\Block\Annotation\Block;
 use Drupal\Core\Url;
 
 /**
@@ -15,7 +14,14 @@ use Drupal\Core\Url;
  * )
  */
 class AluminumPhoneNumberBlock extends AluminumBlockBase {
-  protected function getPhoneNumberOptions() {
+
+  /**
+   * Provides phone number options.
+   *
+   * @return array
+   *   An array of phone number options.
+   */
+  protected function getPhoneNumberOptions(): array {
     $options = [];
 
     foreach (aluminum_storage_phone_numbers() as $phone_number_type => $info) {
@@ -28,7 +34,7 @@ class AluminumPhoneNumberBlock extends AluminumBlockBase {
   /**
    * {@inheritdoc}
    */
-  public function getOptions() {
+  public function getOptions(): array {
     return [
       'phone_number_type' => [
         '#type' => 'select',
@@ -43,7 +49,7 @@ class AluminumPhoneNumberBlock extends AluminumBlockBase {
   /**
    * {@inheritdoc}
    */
-  public function build() {
+  public function build(): array {
     $type = $this->getOptionValue('phone_number_type');
 
     $config = ConfigManager::getConfig('content');
@@ -62,4 +68,5 @@ class AluminumPhoneNumberBlock extends AluminumBlockBase {
         '#url' => $url,
     ];
   }
+
 }
