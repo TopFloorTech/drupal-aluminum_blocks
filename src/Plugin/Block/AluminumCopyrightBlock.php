@@ -11,10 +11,11 @@ namespace Drupal\aluminum_blocks\Plugin\Block;
  * )
  */
 class AluminumCopyrightBlock extends AluminumBlockBase {
+
     /**
      * {@inheritdoc}
      */
-    public function getOptions() {
+    public function getOptions(): array {
         return [
             'copyright_text' => [
                 '#type' => 'textfield',
@@ -29,9 +30,10 @@ class AluminumCopyrightBlock extends AluminumBlockBase {
     /**
      * {@inheritdoc}
      */
-    public function build() {
+    public function build(): array {
         return [
             '#markup' => sprintf('<p>%s</p>', $this->t($this->getOptionValue('copyright_text', TRUE))),
         ];
     }
+
 }

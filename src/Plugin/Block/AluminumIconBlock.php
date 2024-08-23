@@ -2,9 +2,6 @@
 
 namespace Drupal\aluminum_blocks\Plugin\Block;
 
-use Drupal\Core\Annotation\Translation;
-use Drupal\Core\Block\Annotation\Block;
-
 /**
  * Provides an 'Icon' block
  *
@@ -14,12 +11,12 @@ use Drupal\Core\Block\Annotation\Block;
  * )
  */
 class AluminumIconBlock extends AluminumBlockBase {
+
   /**
    * {@inheritdoc}
    */
-  public function getOptions() {
+  public function getOptions(): array {
     $options = [];
-
 
     $options['icon'] = [
       '#type' => 'textfield',
@@ -48,7 +45,7 @@ class AluminumIconBlock extends AluminumBlockBase {
   /**
    * {@inheritdoc}
    */
-  public function build() {
+  public function build(): array {
     $icon = $this->getOptionValue('icon');
 
     if (empty($icon)) {
@@ -62,4 +59,5 @@ class AluminumIconBlock extends AluminumBlockBase {
       '#link_url' => $this->getOptionValue('link_url'),
     ];
   }
+
 }

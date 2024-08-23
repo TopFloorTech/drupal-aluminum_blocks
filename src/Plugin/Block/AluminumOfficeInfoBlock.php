@@ -1,15 +1,7 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: BMcClure
- * Date: 9/9/2016
- * Time: 2:13 PM
- */
 
 namespace Drupal\aluminum_blocks\Plugin\Block;
-use Drupal\aluminum_storage\Aluminum\Config\ConfigManager;
-use Drupal\Core\Annotation\Translation;
-use Drupal\Core\Block\Annotation\Block;
+
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -21,10 +13,11 @@ use Drupal\Core\Form\FormStateInterface;
  * )
  */
 class AluminumOfficeInfoBlock extends AluminumPhoneNumberListBlock {
+
   /**
    * {@inheritdoc}
    */
-  public function getOptions() {
+  public function getOptions(): array {
     $options = parent::getOptions();
 
     $options['custom_phone_number'] = [
@@ -52,6 +45,9 @@ class AluminumOfficeInfoBlock extends AluminumPhoneNumberListBlock {
     return $options;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function blockForm($form, FormStateInterface $form_state) {
     $form = parent::blockForm($form, $form_state);
 
@@ -67,7 +63,7 @@ class AluminumOfficeInfoBlock extends AluminumPhoneNumberListBlock {
   /**
    * {@inheritdoc}
    */
-  public function build() {
+  public function build(): array {
     $officeAddress = $this->getOptionValue('office_address');
     $officeHours = $this->getOptionValue('office_hours');
 
@@ -90,7 +86,15 @@ class AluminumOfficeInfoBlock extends AluminumPhoneNumberListBlock {
     ];
   }
 
-  public function getList() {
+  /**
+   * Gets list of office info.
+   *
+   * @return array
+   *   An array of office info.
+   *
+   * @throws \Drupal\aluminum_storage\Aluminum\Exception\ConfigException
+   */
+  public function getList(): array {
     $list = parent::getList();
 
     $customPhoneNumber = $this->getOptionValue('custom_phone_number');
@@ -105,4 +109,5 @@ class AluminumOfficeInfoBlock extends AluminumPhoneNumberListBlock {
 
     return $list;
   }
+
 }

@@ -2,9 +2,6 @@
 
 namespace Drupal\aluminum_blocks\Plugin\Block;
 
-use Drupal\Core\Annotation\Translation;
-use Drupal\Core\Block\Annotation\Block;
-
 /**
  * Provides a 'Script tag' block
  *
@@ -14,10 +11,11 @@ use Drupal\Core\Block\Annotation\Block;
  * )
  */
 class AluminumScriptTagBlock extends AluminumBlockBase {
+
   /**
    * {@inheritdoc}
    */
-  public function getOptions() {
+  public function getOptions(): array {
     $options = [];
 
     $options['wrapper_classes'] = [
@@ -47,7 +45,7 @@ class AluminumScriptTagBlock extends AluminumBlockBase {
   /**
    * {@inheritdoc}
    */
-  public function build() {
+  public function build(): array {
     $classes = $this->getOptionValue('wrapper_classes');
 
     $classes = trim('AluminumScriptTag ' . $classes);
@@ -59,4 +57,5 @@ class AluminumScriptTagBlock extends AluminumBlockBase {
       '#script' => $this->getOptionValue('script'),
     ];
   }
+
 }

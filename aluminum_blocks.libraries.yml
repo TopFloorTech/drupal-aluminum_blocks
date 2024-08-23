@@ -6,6 +6,10 @@ aluminum_iframe:
   js:
     js/iframeResizer.min.js: {}
     js/aluminum-iframe.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+
 aluminum_addthis:
   version: 1.0.0
   js: {}

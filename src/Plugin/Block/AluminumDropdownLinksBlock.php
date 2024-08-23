@@ -14,7 +14,7 @@ class AluminumDropdownLinksBlock extends AluminumBlockBase {
   /**
    * {@inheritdoc}
    */
-  public function getOptions() {
+  public function getOptions(): array {
     return [
       'button_text' => [
         '#type' => 'textfield',
@@ -32,7 +32,7 @@ class AluminumDropdownLinksBlock extends AluminumBlockBase {
   /**
    * {@inheritdoc}
    */
-  public function build() {
+  public function build(): array {
     return [
       '#theme' => 'aluminum_dropdown_links',
       '#button_text' => $this->getOptionValue('button_text'),
@@ -40,7 +40,13 @@ class AluminumDropdownLinksBlock extends AluminumBlockBase {
     ];
   }
 
-  protected function getList() {
+  /**
+   * Get list of dropdown links.
+   *
+   * @return array
+   *   An array of dropdown links.
+   */
+  protected function getList(): array {
     $list = [];
 
     $links = $this->getOptionValue('link_list');
@@ -62,4 +68,5 @@ class AluminumDropdownLinksBlock extends AluminumBlockBase {
 
     return $list;
   }
+
 }

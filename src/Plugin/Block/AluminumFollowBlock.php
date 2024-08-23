@@ -1,12 +1,11 @@
 <?php
 
 namespace Drupal\aluminum_blocks\Plugin\Block;
+
 use Drupal\aluminum_storage\Aluminum\Config\ConfigManager;
-use Drupal\Core\Annotation\Translation;
-use Drupal\Core\Block\Annotation\Block;
 
 /**
- * Provides a 'Follow links' block
+ * Provides a 'Follow links' block.
  *
  * @Block(
  *     id = "aluminum_follow",
@@ -14,10 +13,11 @@ use Drupal\Core\Block\Annotation\Block;
  * )
  */
 class AluminumFollowBlock extends AluminumBlockBase {
+
   /**
    * {@inheritdoc}
    */
-  public function getOptions() {
+  public function getOptions(): array {
     $options = [];
 
     $options['link_target'] = [
@@ -92,7 +92,18 @@ class AluminumFollowBlock extends AluminumBlockBase {
     return $options;
   }
 
-  protected function iconClass($id) {
+  /**
+   * Get Icon class.
+   *
+   * @param $id
+   *   The id of icon.
+   *
+   * @return mixed|null
+   *   Icon class if defined.
+   *
+   * @throws \Drupal\aluminum_storage\Aluminum\Exception\ConfigException
+   */
+  protected function iconClass($id): mixed {
     $config = ConfigManager::getConfig('appearance');
 
     $class = $config->getValue($id . '_icon_class', 'icons');
@@ -110,7 +121,15 @@ class AluminumFollowBlock extends AluminumBlockBase {
     return $class;
   }
 
-  protected function getSocialNetworks() {
+  /**
+   * Get social networks.
+   *
+   * @return array
+   *   An array of social networks.
+   *
+   * @throws \Drupal\aluminum_storage\Aluminum\Exception\ConfigException
+   */
+  protected function getSocialNetworks(): array {
     $socialNetworks = aluminum_storage_social_networks();
     $networks = [];
 
@@ -140,12 +159,23 @@ class AluminumFollowBlock extends AluminumBlockBase {
     return $networks;
   }
 
-  private function getUrl($id) {
+  /**
+   * Get URL.
+   *
+   * @param $id
+   *   The id.
+   *
+   * @return mixed|null
+   *   The url if found.
+   * @throws \Drupal\aluminum_storage\Aluminum\Exception\ConfigException
+   */
+  private function getUrl($id): mixed {
     $config = ConfigManager::getConfig('content');
 
     if ($this->getOptionValue($id . '_url_override')) {
       $url = $this->getOptionValue($id . '_url');
-    } else {
+    }
+    else {
       $url = $config->getValue($id . '_page_url', 'social', '');
     }
 
@@ -155,11 +185,12 @@ class AluminumFollowBlock extends AluminumBlockBase {
   /**
    * {@inheritdoc}
    */
-  public function build() {
+  public function build(): array {
     return [
       '#theme' => 'aluminum_follow_list',
       '#list' => $this->getSocialNetworks(),
       '#link_target' => $this->getOptionValue('link_target', '_blank'),
     ];
   }
+
 }
