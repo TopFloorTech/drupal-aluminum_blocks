@@ -187,7 +187,9 @@ class AluminumLinkBlock extends AluminumBlockBase {
     $url = $this->getOptionValue('link_url');
 
     if (str_contains($url, '[back]')) {
+      $back_url = '/';
       $previousUrl = $this->requestStack->getCurrentRequest()->server->get('HTTP_REFERER');
+      
       if ($previousUrl) {
         $fake_request = Request::create($previousUrl);
         /** @var \Drupal\Core\Url $url_object */
@@ -196,11 +198,8 @@ class AluminumLinkBlock extends AluminumBlockBase {
         if ($url_object) {
           $back_url = $this->aliasManager->getAliasByPath('/' . $url_object->getInternalPath());
         }
-        else {
-          $back_url = '/';
-        }
-        $url = str_replace('[back]', $back_url, $url);
       }
+      $url = str_replace('[back]', $back_url, $url);
     }
 
     if (str_contains($url, '[current]')) {
